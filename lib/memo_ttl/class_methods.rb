@@ -37,8 +37,6 @@ module MemoTTL
         fetch_or_compute_result(cache, key, original_method, args, block)
       rescue MemoTTL::KeyGenerationError, MemoTTL::MethodBindingError, MemoTTL::CacheOperationError => e
         raise e
-      rescue StandardError => e
-        raise MemoTTL::Error, "Failed to execute memoized method '#{method_name}': #{e.message}"
       end
     end
   end
