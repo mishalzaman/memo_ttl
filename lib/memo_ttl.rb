@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "memo_ttl/version"
+require_relative "memo_ttl/version"
 require_relative "memo_ttl/class_methods"
 require_relative "memo_ttl/instance_methods"
 
