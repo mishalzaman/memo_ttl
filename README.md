@@ -31,12 +31,13 @@ require "memo_ttl"
 class Calculator
   include MemoTTL
 
-  memoize :a_method_that_does_something, ttl: 60, max_size: 100
-
   def a_method_that_does_something(x)
     sleep(2) # simulate slow process
     x * 2
   end
+
+  # use at the bottom due to Ruby's top-down evalation of methods
+  memoize :a_method_that_does_something, ttl: 60, max_size: 100
 end
 
 calc = Calculator.new
@@ -50,4 +51,54 @@ To clear the cache:
 calc.clear_memoized_method(:a_method_that_does_something)
 calc.clear_all_memoized_methods
 calc.cleanup_memoized_methods
+```
+
+### Rails Example
+
+```ruby
+require 'memo_ttl'
+
+class TestController < ApplicationController
+  include MemoTTL
+
+  def index
+    result1 = test_method(1, 2)
+    result2 = test_method(1, 2)
+    result3 = test_method(5, 2)
+    result4 = test_method(1, 2)
+    result5 = test_method(1, 2)
+    result6 = test_method(3, 4)
+
+    render plain: <<~TEXT
+      Result 1: #{result1}
+      Result 2: #{result2}
+      Result 3: #{result3}
+      Result 4: #{result4}
+      Result 5: #{result5}
+      Result 6: #{result6}
+    TEXT
+  end
+
+  def test_method(x, y)
+    puts "Calling test_method(#{x}, #{y})"
+    x + y
+  end
+
+  def clean_up
+    clear_memoized_method(:test_method)
+    clear_all_memoized_methods
+    cleanup_memoized_methods
+  end
+
+  memoize :test_method, ttl: 10, max_size: 10
+end
+```
+
+Output in Rails console:
+
+```
+Processing by TestController#index as HTML
+Calling test_method(1, 2)
+Calling test_method(5, 2)
+Calling test_method(3, 4)
 ```
