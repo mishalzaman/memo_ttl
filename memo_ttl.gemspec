@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 3.1.0"
 
   spec.metadata["allowed_push_host"]   = "https://rubygems.org"
-  spec.metadata["homepage_uri"]        = spec.homepage
+  spec.metadata["homepage_uri"]        = "https://github.com/mishalzaman/memo_ttl"
   spec.metadata["source_code_uri"]     = "https://github.com/mishalzaman/memo_ttl"
   spec.metadata["changelog_uri"]       = "https://github.com/mishalzaman/memo_ttl/blob/main/CHANGELOG.md"
 
