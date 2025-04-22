@@ -1,5 +1,4 @@
 [![Gem Version](https://badge.fury.io/rb/memo_ttl.svg)](https://rubygems.org/gems/memo_ttl)
-[![Build Status](https://github.com/your_username/memo_ttl/workflows/test/badge.svg)](https://github.com/your_username/memo_ttl/actions)
 
 # MemoTTL
 
