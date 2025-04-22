@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 require "memo_ttl/version"
 require "monitor"
 
 # MemoTTL is a thread-safe memoization utility with TTL and LRU eviction.
 module MemoTTL
-
   # Internal cache with TTL (time-to-live) and max size enforcement.
   class Cache
     # Special object used to represent `nil` values safely.
@@ -32,6 +33,7 @@ module MemoTTL
       @lock.synchronize do
         entry = @store[key]
         return nil unless entry
+
         if entry.expires_at && Time.now > entry.expires_at
           delete(key)
           return nil
@@ -63,7 +65,7 @@ module MemoTTL
     def cleanup
       @lock.synchronize do
         now = Time.now
-        expired_keys = @store.select { |key, entry| entry.expires_at && now > entry.expires_at }.keys
+        expired_keys = @store.select { |_key, entry| entry.expires_at && now > entry.expires_at }.keys
         expired_keys.each { |key| delete(key) }
       end
     end
@@ -107,10 +109,13 @@ module MemoTTL
       cache_var = "@_memo_ttl_#{method_name}"
 
       define_method(method_name) do |*args, &block|
-        instance_variable_set(cache_var, Cache.new(ttl: ttl, max_size: max_size)) unless instance_variable_defined?(cache_var)
+        unless instance_variable_defined?(cache_var)
+          instance_variable_set(cache_var,
+                                Cache.new(ttl: ttl, max_size: max_size))
+        end
         cache = instance_variable_get(cache_var)
 
-        key = "#{object_id}-#{method_name}-#{args.map(&:hash).join('-')}-#{block&.hash}"
+        key = "#{object_id}-#{method_name}-#{args.map(&:hash).join("-")}-#{block&.hash}"
 
         result = cache.get(key)
         return result unless result.nil? && !cache.instance_variable_get(:@store).key?(key)
@@ -142,9 +147,7 @@ module MemoTTL
     # Cleans up expired entries in all memoized caches.
     def cleanup_memoized_methods
       instance_variables.each do |var|
-        if var.to_s.start_with?("@_memo_ttl_")
-          instance_variable_get(var).cleanup
-        end
+        instance_variable_get(var).cleanup if var.to_s.start_with?("@_memo_ttl_")
       end
     end
   end

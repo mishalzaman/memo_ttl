@@ -1,18 +1,18 @@
 example_id                     | status | run_time        |
 ------------------------------ | ------ | --------------- |
-./spec/memo_ttl_spec.rb[1:1:1] | passed | 0.00035 seconds |
-./spec/memo_ttl_spec.rb[1:1:2] | passed | 0.00055 seconds |
-./spec/memo_ttl_spec.rb[1:1:3] | passed | 0.00006 seconds |
-./spec/memo_ttl_spec.rb[1:1:4] | passed | 0.00008 seconds |
-./spec/memo_ttl_spec.rb[1:1:5] | passed | 0.00018 seconds |
-./spec/memo_ttl_spec.rb[1:1:6] | passed | 0.00015 seconds |
-./spec/memo_ttl_spec.rb[1:1:7] | passed | 0.00009 seconds |
-./spec/memo_ttl_spec.rb[1:2:1] | passed | 0.00011 seconds |
+./spec/cache_spec.rb[1:1]      | passed | 0.00057 seconds |
+./spec/cache_spec.rb[1:2]      | passed | 0.0007 seconds  |
+./spec/cache_spec.rb[1:3]      | passed | 0.00016 seconds |
+./spec/cache_spec.rb[1:4]      | passed | 0.00007 seconds |
+./spec/cache_spec.rb[1:5]      | passed | 0.00007 seconds |
+./spec/cache_spec.rb[1:6]      | passed | 0.00014 seconds |
+./spec/cache_spec.rb[1:7]      | passed | 0.0001 seconds  |
+./spec/memo_ttl_spec.rb[1:1:1] | passed | 0.00009 seconds |
+./spec/memo_ttl_spec.rb[1:1:2] | passed | 0.00007 seconds |
+./spec/memo_ttl_spec.rb[1:1:3] | passed | 0.00007 seconds |
+./spec/memo_ttl_spec.rb[1:2:1] | passed | 0.00009 seconds |
 ./spec/memo_ttl_spec.rb[1:2:2] | passed | 0.0001 seconds  |
-./spec/memo_ttl_spec.rb[1:2:3] | passed | 0.0001 seconds  |
-./spec/memo_ttl_spec.rb[1:2:4] | passed | 0.00012 seconds |
-./spec/memo_ttl_spec.rb[1:2:5] | passed | 0.0001 seconds  |
-./spec/memo_ttl_spec.rb[1:2:6] | passed | 0.0001 seconds  |
-./spec/memo_ttl_spec.rb[1:2:7] | passed | 0.0001 seconds  |
-./spec/memo_ttl_spec.rb[1:2:8] | passed | 0.0002 seconds  |
-./spec/memo_ttl_spec.rb[1:2:9] | passed | 0.00012 seconds |
+./spec/memo_ttl_spec.rb[1:3:1] | passed | 0.00007 seconds |
+./spec/memo_ttl_spec.rb[1:3:2] | passed | 0.00007 seconds |
+./spec/memo_ttl_spec.rb[1:3:3] | passed | 0.00017 seconds |
+./spec/memo_ttl_spec.rb[1:3:4] | passed | 0.00009 seconds |

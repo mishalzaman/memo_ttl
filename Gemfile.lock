@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    memo_ttl (0.2.18)
+    memo_ttl (0.2.19)
 
 GEM
   remote: https://rubygems.org/
