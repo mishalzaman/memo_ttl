@@ -31,7 +31,7 @@ require "memo_ttl"
 class Calculator
   include MemoTTL
 
-  memoize :expensive_method, ttl: 60, max_size: 100
+  memoize :a_method_that_does_something, ttl: 60, max_size: 100
 
   def a_method_that_does_something(x)
     sleep(2) # simulate slow process
