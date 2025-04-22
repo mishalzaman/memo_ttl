@@ -1,4 +1,4 @@
-# MemoTTL
+# MemoTTL (WIP)
 
 **MemoTTL** is a thread-safe memoization utility for Ruby that supports TTL (Time-To-Live) and LRU (Least Recently Used) eviction. It's designed for scenarios where memoized values should expire after a period and memory usage must be constrained.
 
