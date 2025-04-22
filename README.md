@@ -1,43 +1,53 @@
-# MemoTtl
+# MemoTTL
 
-TODO: Delete this and the text below, and describe your gem
+**MemoTTL** is a thread-safe memoization utility for Ruby that supports TTL (Time-To-Live) and LRU (Least Recently Used) eviction. It's designed for scenarios where memoized values should expire after a period and memory usage must be constrained.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/memo_ttl`. To experiment with that code, run `bin/console` for an interactive prompt.
+## Features
+
+- ⚡ Memoize method results with expiration (TTL)
+- 🧠 Built-in LRU eviction to limit memory usage
+- 🔒 Thread-safe with Monitor
+- 🧩 Easy integration via `include MemoTTL`
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add this line to your application's Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
-
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem "memo_ttl"
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+Afterwards:
 
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+bundle install
 ```
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require "memo_ttl"
 
-## Development
+class Calculator
+  include MemoTTL
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+  memoize :expensive_method, ttl: 60, max_size: 100
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+  def a_method_that_does_something(x)
+    sleep(2) # simulate slow process
+    x * 2
+  end
+end
 
-## Contributing
+calc = Calculator.new
+calc.a_method_that_does_something(5) # takes 2 seconds
+calc.a_method_that_does_something(5) # returns instantly from cache
+```
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/memo_ttl. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/memo_ttl/blob/main/CODE_OF_CONDUCT.md).
+To clear the cache:
 
-## License
-
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the MemoTtl project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/memo_ttl/blob/main/CODE_OF_CONDUCT.md).
+```ruby
+calc.clear_memoized_method(:a_method_that_does_something)
+calc.clear_all_memoized_methods
+calc.cleanup_memoized_methods
+```
