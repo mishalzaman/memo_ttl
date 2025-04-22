@@ -6,7 +6,6 @@ require_relative "memo_ttl/instance_methods"
 
 # MemoTTL is a thread-safe memoization utility with TTL and LRU eviction.
 module MemoTTL
-  # Custom error classes for more specific error handling
   class Error < StandardError; end
   class KeyGenerationError < Error; end
   class MethodBindingError < Error; end

@@ -18,7 +18,6 @@ module MemoTTL
     # @raise [ArgumentError] if max_size or ttl are not positive integers
     def initialize(max_size: 100, ttl: 60)
       raise ArgumentError, "max_size must be a positive integer" unless max_size.is_a?(Integer) && max_size.positive?
-
       raise ArgumentError, "ttl must be a positive integer" unless ttl.is_a?(Integer) && ttl.positive?
 
       @max_size = max_size
@@ -57,8 +56,8 @@ module MemoTTL
     # @raise [CacheOperationError] if there's an issue storing in the cache
     def set(key, value)
       @lock.synchronize do
+        evict if !@store.key?(key) && @store.size >= @max_size
         delete(key) if @store.key?(key)
-        evict if @store.size >= @max_size
         stored_value = value.nil? ? NULL_OBJECT : value
         @store[key] = Entry.new(stored_value, Time.now + @ttl)
         @order.unshift(key)
@@ -70,24 +69,32 @@ module MemoTTL
 
     # Removes all expired entries from the cache.
     #
-    # @return [void]
+    # @return [Integer] number of entries removed
     # @raise [CacheOperationError] if there's an issue during cleanup
     def cleanup
       @lock.synchronize do
         now = Time.now
         expired_keys = @store.select { |_key, entry| entry.expires_at && now > entry.expires_at }.keys
         expired_keys.each { |key| delete(key) }
+        expired_keys.size
       rescue StandardError => e
         raise CacheOperationError, "Failed during cache cleanup: #{e.message}"
       end
     end
 
-    # Checks if a key exists in the cache, regardless of its value
+    # Checks if a key exists in the cache, regardless of its value.
     #
     # @param key [Object] the key to check
     # @return [Boolean] true if the key exists, false otherwise
     def key?(key)
       @lock.synchronize { @store.key?(key) }
+    end
+
+    # Returns the number of current entries in the cache.
+    #
+    # @return [Integer]
+    def size
+      @lock.synchronize { @store.size }
     end
 
     private
@@ -100,20 +107,20 @@ module MemoTTL
       @order.delete(key)
     end
 
-    # Marks a key as most recently used.
-    #
-    # @param key [Object] the key to touch
-    def touch(key)
-      @order.delete(key)
-      @order.unshift(key)
-    end
-
     # Removes the least recently used entry.
     #
     # @return [void]
     def evict
       oldest_key = @order.pop
       @store.delete(oldest_key)
+    end
+
+    # Marks a key as most recently used.
+    #
+    # @param key [Object] the key to touch
+    def touch(key)
+      @order.delete(key)
+      @order.unshift(key) unless @order.first == key
     end
   end
 end
