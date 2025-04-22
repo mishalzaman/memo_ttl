@@ -15,7 +15,12 @@ module MemoTTL
     #
     # @param max_size [Integer] maximum number of entries to keep
     # @param ttl [Integer] time-to-live in seconds for each entry
+    # @raise [ArgumentError] if max_size or ttl are not positive integers
     def initialize(max_size: 100, ttl: 60)
+      raise ArgumentError, "max_size must be a positive integer" unless max_size.is_a?(Integer) && max_size.positive?
+
+      raise ArgumentError, "ttl must be a positive integer" unless ttl.is_a?(Integer) && ttl.positive?
+
       @max_size = max_size
       @ttl = ttl
       @store = {}
@@ -27,6 +32,7 @@ module MemoTTL
     #
     # @param key [Object] the key to retrieve
     # @return [Object, nil] the cached value or nil
+    # @raise [CacheOperationError] if there's an issue accessing the cache
     def get(key)
       @lock.synchronize do
         entry = @store[key]
@@ -38,6 +44,8 @@ module MemoTTL
         end
         touch(key)
         entry.value == NULL_OBJECT ? nil : entry.value
+      rescue StandardError => e
+        raise CacheOperationError, "Failed to get key #{key}: #{e.message}"
       end
     end
 
@@ -46,6 +54,7 @@ module MemoTTL
     # @param key [Object] the key to store under
     # @param value [Object, nil] the value to store
     # @return [Object] the value that was stored
+    # @raise [CacheOperationError] if there's an issue storing in the cache
     def set(key, value)
       @lock.synchronize do
         delete(key) if @store.key?(key)
@@ -54,18 +63,31 @@ module MemoTTL
         @store[key] = Entry.new(stored_value, Time.now + @ttl)
         @order.unshift(key)
         value
+      rescue StandardError => e
+        raise CacheOperationError, "Failed to set key #{key}: #{e.message}"
       end
     end
 
     # Removes all expired entries from the cache.
     #
     # @return [void]
+    # @raise [CacheOperationError] if there's an issue during cleanup
     def cleanup
       @lock.synchronize do
         now = Time.now
         expired_keys = @store.select { |_key, entry| entry.expires_at && now > entry.expires_at }.keys
         expired_keys.each { |key| delete(key) }
+      rescue StandardError => e
+        raise CacheOperationError, "Failed during cache cleanup: #{e.message}"
       end
+    end
+
+    # Checks if a key exists in the cache, regardless of its value
+    #
+    # @param key [Object] the key to check
+    # @return [Boolean] true if the key exists, false otherwise
+    def key?(key)
+      @lock.synchronize { @store.key?(key) }
     end
 
     private

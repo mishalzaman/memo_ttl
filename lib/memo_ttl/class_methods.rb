@@ -10,7 +10,13 @@ module MemoTTL
     # @param method_name [Symbol] the name of the method to memoize
     # @param ttl [Integer] time-to-live in seconds for the memoized result
     # @param max_size [Integer] maximum number of memoized results to keep
+    # @raise [NameError] if the method doesn't exist
+    # @raise [ArgumentError] if ttl or max_size are invalid
     def memoize(method_name, ttl: 60, max_size: 100)
+      unless method_defined?(method_name) || private_method_defined?(method_name)
+        raise NameError, "Method '#{method_name}' not defined in #{self}"
+      end
+
       original_method = instance_method(method_name)
       cache_var = "@_memo_ttl_#{method_name}"
 
@@ -23,8 +29,13 @@ module MemoTTL
       define_method(method_name) do |*args, &block|
         cache = fetch_or_create_cache(cache_var, ttl, max_size)
         key = build_cache_key(method_name, args, block)
-
         fetch_or_compute_result(cache, key, original_method, args, block)
+      rescue MemoTTL::KeyGenerationError, MemoTTL::MethodBindingError, MemoTTL::CacheOperationError => e
+        # Re-raise specific MemoTTL errors
+        raise e
+      rescue StandardError => e
+        # Wrap other errors
+        raise MemoTTL::Error, "Failed to execute memoized method '#{method_name}': #{e.message}"
       end
     end
   end
