@@ -4,10 +4,10 @@
 
 ## Features
 
-- ⚡ Memoize method results with expiration (TTL)
-- 🧠 Built-in LRU eviction to limit memory usage
-- 🔒 Thread-safe with Monitor
-- 🧩 Easy integration via `include MemoTTL`
+- Memoize method results with expiration (TTL)
+- Built-in LRU eviction to limit memory usage
+- Thread-safe with Monitor
+- Easy integration via `include MemoTTL`
 
 ## Installation
 
