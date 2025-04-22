@@ -24,5 +24,28 @@ module MemoTTL
         instance_variable_get(var).cleanup if var.to_s.start_with?("@_memo_ttl_")
       end
     end
+
+    # Private helper methods for memoization implementation
+    private
+
+    def fetch_or_create_cache(cache_var, ttl, max_size)
+      unless instance_variable_defined?(cache_var)
+        instance_variable_set(cache_var, Cache.new(ttl: ttl, max_size: max_size))
+      end
+      instance_variable_get(cache_var)
+    end
+
+    def build_cache_key(method_name, args, block)
+      "#{object_id}-#{method_name}-#{args.map(&:hash).join("-")}-#{block&.hash}"
+    end
+
+    def fetch_or_compute_result(cache, key, original_method, args, block)
+      result = cache.get(key)
+      return result unless result.nil? && !cache.instance_variable_get(:@store).key?(key)
+
+      result = original_method.bind(self).call(*args, &block)
+      cache.set(key, result)
+      result
+    end
   end
 end

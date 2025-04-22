@@ -14,21 +14,17 @@ module MemoTTL
       original_method = instance_method(method_name)
       cache_var = "@_memo_ttl_#{method_name}"
 
+      define_memoized_method(method_name, cache_var, original_method, ttl, max_size)
+    end
+
+    private
+
+    def define_memoized_method(method_name, cache_var, original_method, ttl, max_size)
       define_method(method_name) do |*args, &block|
-        unless instance_variable_defined?(cache_var)
-          instance_variable_set(cache_var,
-                                Cache.new(ttl: ttl, max_size: max_size))
-        end
-        cache = instance_variable_get(cache_var)
+        cache = fetch_or_create_cache(cache_var, ttl, max_size)
+        key = build_cache_key(method_name, args, block)
 
-        key = "#{object_id}-#{method_name}-#{args.map(&:hash).join("-")}-#{block&.hash}"
-
-        result = cache.get(key)
-        return result unless result.nil? && !cache.instance_variable_get(:@store).key?(key)
-
-        result = original_method.bind(self).call(*args, &block)
-        cache.set(key, result)
-        result
+        fetch_or_compute_result(cache, key, original_method, args, block)
       end
     end
   end
