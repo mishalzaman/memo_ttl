@@ -12,3 +12,9 @@ gem "rspec", "~> 3.0"
 gem "timecop"
 
 gem "rubocop", "~> 1.21"
+
+group :development do
+  gem "benchmark-ips"
+  gem "memory_profiler"
+  gem "pry"
+end
