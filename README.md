@@ -11,6 +11,22 @@
 - Thread-safe with Monitor
 - Easy integration via `include MemoTTL`
 
+## ✅ When to Use
+
+Use `memo_ttl` when:
+
+- ✅ You're calling a **pure method** multiple times with the same arguments
+- ✅ The method is **expensive** (I/O, DB, parsing, computation)
+- ✅ You want **in-memory** caching without Redis or external dependencies
+- ✅ You need **per-object isolation** — not global cache key management
+- ✅ You want a cache that’s **automatically invalidated** via TTL and LRU
+
+Avoid using it when:
+
+- ❌ The method is already fast (e.g., simple arithmetic, inline logic)
+- ❌ You're calling it with **unique arguments** every time
+- ❌ You need cross-request or cross-process persistence (use `Rails.cache`)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -104,19 +120,3 @@ Calling test_method(1, 2)
 Calling test_method(5, 2)
 Calling test_method(3, 4)
 ```
-
-## ✅ When to Use
-
-Use `memo_ttl` when:
-
-- ✅ You're calling a **pure method** multiple times with the same arguments
-- ✅ The method is **expensive** (I/O, DB, parsing, computation)
-- ✅ You want **in-memory** caching without Redis or external dependencies
-- ✅ You need **per-object isolation** — not global cache key management
-- ✅ You want a cache that’s **automatically invalidated** via TTL and LRU
-
-Avoid using it when:
-
-- ❌ The method is already fast (e.g., simple arithmetic, inline logic)
-- ❌ You're calling it with **unique arguments** every time
-- ❌ You need cross-request or cross-process persistence (use `Rails.cache`)
